@@ -14,7 +14,7 @@ import { formatAmount, formatUSD, balanceToUSD, Currency } from '@/services/data
 import TransactionRow from '@/components/ui/TransactionRow';
 
 const CURRENCIES: Currency[] = ['USD', 'EUR', 'SYP', 'TRY'];
-const CURR_ICONS: Record<Currency, string> = { USD: '🇺🇸', EUR: '🇪🇺', SYP: '🇸🇾', TRY: '🇹🇷' };
+const CURR_ICONS: Record<Currency, string> = { USD: '🇺🇸', EUR: '🇪🇺', SYP: '🟩⬜⬛', TRY: '🇹🇷' };
 const CURR_SYMBOLS: Record<Currency, string> = { USD: '$', EUR: '€', SYP: 'ل.س', TRY: '₺' };
 
 function buildPdfHtml(

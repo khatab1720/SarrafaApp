@@ -1,8 +1,8 @@
 // Powered by OnSpace.AI
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, Pressable,
-  StatusBar,
+  StatusBar, Animated,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,12 +15,25 @@ import QuickAction from '@/components/ui/QuickAction';
 import TransactionRow from '@/components/ui/TransactionRow';
 import SectionHeader from '@/components/ui/SectionHeader';
 
-const CURRENCY_INFO: { currency: Currency; label: string; icon: string }[] = [
+// New Syrian independence flag (green-white-black tricolor with stars)
+const SyrianFlag = () => (
+  <View style={{ width: 28, height: 20, borderRadius: 3, overflow: 'hidden', flexDirection: 'column' }}>
+    <View style={{ flex: 1, backgroundColor: '#009000' }} />
+    <View style={{ flex: 1, backgroundColor: '#FFFFFF' }} />
+    <View style={{ flex: 1, backgroundColor: '#000000' }} />
+  </View>
+);
+
+const CURRENCY_INFO: { currency: Currency; label: string; icon: string; isSyrian?: boolean }[] = [
   { currency: 'USD', label: 'دولار أمريكي', icon: '🇺🇸' },
   { currency: 'EUR', label: 'يورو أوروبي', icon: '🇪🇺' },
-  { currency: 'SYP', label: 'ليرة سورية', icon: '🇸🇾' },
+  { currency: 'SYP', label: 'ليرة سورية', icon: 'SYR' },
   { currency: 'TRY', label: 'ليرة تركية', icon: '🇹🇷' },
 ];
+
+const HEADER_MAX_HEIGHT = 300;
+const HEADER_MIN_HEIGHT = 0;
+const COLLAPSE_THRESHOLD = 140;
 
 export default function DashboardScreen() {
   const { totalBalance, totalUSD, transactions } = useApp();
@@ -29,30 +42,71 @@ export default function DashboardScreen() {
   const recentTx = transactions.slice(0, 5);
   const isPositive = totalUSD >= 0;
 
+  const [balanceHidden, setBalanceHidden] = useState(false);
+  const [headerCollapsed, setHeaderCollapsed] = useState(false);
+
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const lastScrollY = useRef(0);
+
+  const heroOpacity = scrollY.interpolate({
+    inputRange: [0, COLLAPSE_THRESHOLD],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
+
+  const heroHeight = scrollY.interpolate({
+    inputRange: [0, COLLAPSE_THRESHOLD],
+    outputRange: [HEADER_MAX_HEIGHT, HEADER_MIN_HEIGHT],
+    extrapolate: 'clamp',
+  });
+
   return (
     <View style={styles.root}>
       <StatusBar barStyle="light-content" />
 
-      {/* ── Glassmorphism Header ── */}
-      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
-        {/* Top row */}
-        <View style={styles.headerTop}>
-          <Pressable style={styles.notifBtn}>
-            <MaterialIcons name="notifications-none" size={22} color="rgba(255,255,255,0.75)" />
-          </Pressable>
-          <View style={styles.headerTitleGroup}>
-            <Text style={styles.headerSub}>لوحة التحكم</Text>
-            <Text style={styles.headerTitle}>مكتب الصرافة</Text>
-          </View>
+      {/* ── Fixed Top Bar (always visible) ── */}
+      <View style={[styles.topBar, { paddingTop: insets.top + 10 }]}>
+        <Pressable style={styles.notifBtn}>
+          <MaterialIcons name="notifications-none" size={22} color="rgba(255,255,255,0.75)" />
+        </Pressable>
+        <View style={styles.headerTitleGroup}>
+          <Text style={styles.headerSub}>لوحة التحكم</Text>
+          <Text style={styles.headerTitle}>مكتب الصرافة</Text>
         </View>
+      </View>
 
+      {/* ── Animated Hero Section ── */}
+      <Animated.View style={[styles.heroSection, { height: heroHeight, opacity: heroOpacity }]}>
         {/* Balance Hero */}
         <View style={styles.balanceHero}>
           <View style={styles.balanceGlassCard}>
-            <Text style={styles.balanceCurrencyLabel}>إجمالي الرصيد (USD)</Text>
-            <Text style={[styles.balanceAmount, { color: isPositive ? '#A8F0B4' : '#F9A8A8' }]}>
-              {isPositive ? '+' : '-'}{formatUSD(Math.abs(totalUSD))}
-            </Text>
+            <View style={styles.balanceTopRow}>
+              <Pressable
+                onPress={() => setBalanceHidden(h => !h)}
+                style={styles.eyeBtn}
+                hitSlop={10}
+              >
+                <MaterialIcons
+                  name={balanceHidden ? 'visibility-off' : 'visibility'}
+                  size={19}
+                  color="rgba(255,255,255,0.6)"
+                />
+              </Pressable>
+              <Text style={styles.balanceCurrencyLabel}>إجمالي الرصيد (USD)</Text>
+            </View>
+
+            {balanceHidden ? (
+              <View style={styles.hiddenBalance}>
+                {[1, 2, 3, 4, 5].map(i => (
+                  <View key={i} style={styles.hiddenDot} />
+                ))}
+              </View>
+            ) : (
+              <Text style={[styles.balanceAmount, { color: isPositive ? '#A8F0B4' : '#F9A8A8' }]}>
+                {isPositive ? '+' : '-'}{formatUSD(Math.abs(totalUSD))}
+              </Text>
+            )}
+
             <View style={styles.balanceBadge}>
               <MaterialIcons
                 name={isPositive ? 'trending-up' : 'trending-down'}
@@ -93,13 +147,44 @@ export default function DashboardScreen() {
             color="#CE93D8"
           />
         </View>
-      </View>
+      </Animated.View>
 
-      <ScrollView
+      <Animated.ScrollView
         style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={[styles.scrollContent]}
         showsVerticalScrollIndicator={false}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          {
+            useNativeDriver: false,
+            listener: (event: any) => {
+              const y = event.nativeEvent.contentOffset.y;
+              lastScrollY.current = y;
+              setHeaderCollapsed(y > COLLAPSE_THRESHOLD - 20);
+            },
+          }
+        )}
+        scrollEventThrottle={16}
       >
+        {/* Collapsed Mini Balance Bar */}
+        {headerCollapsed && (
+          <View style={styles.miniBalanceBar}>
+            <Pressable onPress={() => setBalanceHidden(h => !h)} hitSlop={10}>
+              <MaterialIcons
+                name={balanceHidden ? 'visibility-off' : 'visibility'}
+                size={15}
+                color={Colors.text.muted}
+              />
+            </Pressable>
+            <Text style={[styles.miniBalance, { color: isPositive ? Colors.success : Colors.error }]}>
+              {balanceHidden
+                ? '••••••'
+                : `${isPositive ? '+' : '-'}${formatUSD(Math.abs(totalUSD))}`}
+            </Text>
+            <Text style={styles.miniBalanceLabel}>الرصيد الإجمالي</Text>
+          </View>
+        )}
+
         {/* Currency Cards */}
         <SectionHeader title="أرصدة العملات" />
         <View style={styles.currencyGrid}>
@@ -110,6 +195,7 @@ export default function DashboardScreen() {
               amount={totalBalance[currency]}
               label={label}
               icon={icon}
+              isSyrianFlag={currency === 'SYP'}
             />
           ))}
         </View>
@@ -130,7 +216,7 @@ export default function DashboardScreen() {
             <TransactionRow key={tx.id} transaction={tx} />
           ))
         )}
-      </ScrollView>
+      </Animated.ScrollView>
     </View>
   );
 }
@@ -138,20 +224,16 @@ export default function DashboardScreen() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: Colors.background },
 
-  // ── Glassmorphism Header ──
-  header: {
+  // Fixed top bar
+  topBar: {
     backgroundColor: Colors.primary,
     paddingHorizontal: Spacing.md,
-    paddingBottom: Spacing.lg,
-    // Subtle inner glow
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(255,255,255,0.08)',
-  },
-  headerTop: {
+    paddingBottom: 12,
     flexDirection: 'row-reverse',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: Spacing.md,
+    zIndex: 10,
+    borderBottomWidth: 0,
   },
   notifBtn: {
     width: 38,
@@ -178,10 +260,18 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
 
+  // Animated hero
+  heroSection: {
+    backgroundColor: Colors.primary,
+    overflow: 'hidden',
+    paddingHorizontal: Spacing.md,
+    paddingBottom: Spacing.lg,
+  },
+
   // Balance glass card
-  balanceHero: { alignItems: 'center', marginBottom: Spacing.lg },
+  balanceHero: { alignItems: 'center', marginBottom: Spacing.lg, marginTop: 6 },
   balanceGlassCard: {
-    backgroundColor: 'rgba(255,255,255,0.07)',
+    backgroundColor: 'rgba(255,255,255,0.08)',
     borderRadius: BorderRadius.xl,
     paddingVertical: Spacing.lg,
     paddingHorizontal: Spacing.xl,
@@ -190,19 +280,42 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.14)',
   },
+  balanceTopRow: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 6,
+  },
   balanceCurrencyLabel: {
     fontSize: FontSizes.xs,
     color: 'rgba(255,255,255,0.5)',
     fontWeight: '600',
     letterSpacing: 1.2,
     textTransform: 'uppercase',
-    marginBottom: 6,
+    flex: 1,
+    textAlign: 'right',
+  },
+  eyeBtn: {
+    padding: 4,
   },
   balanceAmount: {
     fontSize: 44,
     fontWeight: '800',
     letterSpacing: -1,
     marginBottom: 8,
+  },
+  hiddenBalance: {
+    flexDirection: 'row',
+    gap: 10,
+    marginVertical: 16,
+    alignItems: 'center',
+  },
+  hiddenDot: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: 'rgba(255,255,255,0.45)',
   },
   balanceBadge: {
     flexDirection: 'row',
@@ -222,6 +335,32 @@ const styles = StyleSheet.create({
   quickActions: {
     flexDirection: 'row-reverse',
     justifyContent: 'space-around',
+  },
+
+  // Mini balance bar when collapsed
+  miniBalanceBar: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    backgroundColor: Colors.card,
+    borderRadius: BorderRadius.lg,
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 10,
+    marginBottom: Spacing.md,
+    gap: Spacing.sm,
+    ...Shadows.sm,
+    borderWidth: 1,
+    borderColor: Colors.border,
+  },
+  miniBalanceLabel: {
+    fontSize: FontSizes.sm,
+    color: Colors.text.muted,
+    flex: 1,
+    textAlign: 'right',
+  },
+  miniBalance: {
+    fontSize: FontSizes.lg,
+    fontWeight: '800',
+    letterSpacing: -0.5,
   },
 
   scroll: { flex: 1 },

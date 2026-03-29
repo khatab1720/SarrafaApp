@@ -68,7 +68,7 @@ export function formatUSD(amount: number): string {
 export const PERMANENT_CLIENTS: Client[] = [
   {
     id: 'permanent_sham',
-    name: 'Sham Chash',
+    name: 'Sham Cash',
     createdAt: '2024-01-01T00:00:00',
     isPermanent: true,
   },

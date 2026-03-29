@@ -9,6 +9,17 @@ interface CurrencyCardProps {
   amount: number;
   label: string;
   icon: string;
+  isSyrianFlag?: boolean;
+}
+
+function SyrianFlagIcon() {
+  return (
+    <View style={{ width: 26, height: 18, borderRadius: 3, overflow: 'hidden' }}>
+      <View style={{ flex: 1, backgroundColor: '#009000' }} />
+      <View style={{ flex: 1, backgroundColor: '#FFFFFF' }} />
+      <View style={{ flex: 1, backgroundColor: '#000000' }} />
+    </View>
+  );
 }
 
 const CURRENCY_COLORS: Record<Currency, { bg: string; text: string; border: string; accent: string }> = {
@@ -18,7 +29,7 @@ const CURRENCY_COLORS: Record<Currency, { bg: string; text: string; border: stri
   TRY: { bg: '#FDF4FF', text: '#6B21A8', border: '#E9D5FF', accent: '#9333EA' },
 };
 
-export default function CurrencyCard({ currency, amount, label, icon }: CurrencyCardProps) {
+export default function CurrencyCard({ currency, amount, label, icon, isSyrianFlag }: CurrencyCardProps) {
   const colors = CURRENCY_COLORS[currency];
   const isPositive = amount >= 0;
 
@@ -29,7 +40,7 @@ export default function CurrencyCard({ currency, amount, label, icon }: Currency
         <View style={[styles.currencyBadge, { backgroundColor: colors.accent + '18' }]}>
           <Text style={[styles.currency, { color: colors.accent }]}>{currency}</Text>
         </View>
-        <Text style={styles.icon}>{icon}</Text>
+        {isSyrianFlag ? <SyrianFlagIcon /> : <Text style={styles.icon}>{icon}</Text>}
       </View>
 
       {/* Label */}
