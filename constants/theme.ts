@@ -1,8 +1,8 @@
 // Powered by OnSpace.AI
 export const Colors = {
-  primary: '#11608F',       // Deep Blue
-  primaryLight: '#1A7DB8',
-  primaryDark: '#0A4A70',
+  primary: '#1B52CC',       // Royal Blue
+  primaryLight: '#2D67E0',
+  primaryDark: '#1340A8',
   accent: '#F0B429',        // Gold
   accentDark: '#C89A1A',
   background: '#EEF2F7',
@@ -23,10 +23,10 @@ export const Colors = {
   },
   border: '#E2EAF0',
   divider: '#EDF2F7',
-  shadow: 'rgba(17, 96, 143, 0.15)',
-  overlay: 'rgba(17, 96, 143, 0.6)',
+  shadow: 'rgba(27, 82, 204, 0.15)',
+  overlay: 'rgba(27, 82, 204, 0.6)',
   // Glassmorphism tokens
-  glass: 'rgba(17, 96, 143, 0.72)',
+  glass: 'rgba(27, 82, 204, 0.72)',
   glassLight: 'rgba(255, 255, 255, 0.12)',
   glassBorder: 'rgba(255, 255, 255, 0.18)',
 };
@@ -60,21 +60,21 @@ export const BorderRadius = {
 
 export const Shadows = {
   sm: {
-    shadowColor: 'rgba(17, 96, 143, 0.12)',
+    shadowColor: 'rgba(27, 82, 204, 0.12)',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 1,
     shadowRadius: 6,
     elevation: 3,
   },
   md: {
-    shadowColor: 'rgba(17, 96, 143, 0.15)',
+    shadowColor: 'rgba(27, 82, 204, 0.15)',
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 1,
     shadowRadius: 14,
     elevation: 7,
   },
   lg: {
-    shadowColor: 'rgba(17, 96, 143, 0.20)',
+    shadowColor: 'rgba(27, 82, 204, 0.20)',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 1,
     shadowRadius: 22,

@@ -26,7 +26,7 @@ export default function TabLayout() {
     }),
     paddingHorizontal: 8,
     // Glassmorphism bottom nav
-    backgroundColor: 'rgba(17, 96, 143, 0.94)',
+    backgroundColor: 'rgba(27, 82, 204, 0.94)',
     borderTopWidth: 1,
     borderTopColor: 'rgba(255,255,255,0.10)',
     ...Shadows.lg,
