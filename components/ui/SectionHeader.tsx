@@ -15,12 +15,15 @@ export default function SectionHeader({ title, actionLabel, onAction }: SectionH
       {actionLabel && onAction ? (
         <Pressable
           onPress={onAction}
-          style={({ pressed }) => [styles.actionBtn, pressed && { opacity: 0.7 }]}
+          style={({ pressed }) => [styles.actionBtn, pressed && { opacity: 0.70 }]}
         >
           <Text style={styles.action}>{actionLabel}</Text>
         </Pressable>
       ) : <View />}
-      <Text style={styles.title}>{title}</Text>
+      <View style={styles.titleRow}>
+        <View style={styles.titleAccent} />
+        <Text style={styles.title}>{title}</Text>
+      </View>
     </View>
   );
 }
@@ -30,25 +33,40 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: Spacing.sm,
+    marginBottom: Spacing.md,
+    marginTop: Spacing.sm,
     paddingHorizontal: 2,
+  },
+  titleRow: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 8,
+  },
+  titleAccent: {
+    width: 4,
+    height: 18,
+    borderRadius: 2,
+    backgroundColor: Colors.accent,
   },
   title: {
     fontSize: FontSizes.lg,
-    fontWeight: '700',
+    fontWeight: '800',
     color: Colors.text.primary,
     textAlign: 'right',
     letterSpacing: 0.2,
   },
   actionBtn: {
-    backgroundColor: Colors.accent + '22',
-    paddingHorizontal: 12,
-    paddingVertical: 5,
+    backgroundColor: Colors.primarySurface,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
     borderRadius: BorderRadius.full,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   action: {
     fontSize: FontSizes.xs,
-    color: Colors.accentDark,
+    color: Colors.primaryLight,
     fontWeight: '700',
+    letterSpacing: 0.3,
   },
 });

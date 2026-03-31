@@ -16,13 +16,19 @@ export default function TransactionRow({ transaction, onDelete, showClient = tru
 
   return (
     <View style={styles.row}>
-      <View style={[styles.icon, { backgroundColor: isGive ? Colors.errorLight : Colors.successLight }]}>
+      {/* Icon */}
+      <View style={[
+        styles.iconWrap,
+        { backgroundColor: isGive ? Colors.errorLight : Colors.successLight }
+      ]}>
         <MaterialIcons
           name={isGive ? 'arrow-upward' : 'arrow-downward'}
-          size={17}
+          size={16}
           color={isGive ? Colors.error : Colors.success}
         />
       </View>
+
+      {/* Info */}
       <View style={styles.info}>
         {showClient && (
           <Text style={styles.client} numberOfLines={1}>{transaction.clientName}</Text>
@@ -32,23 +38,30 @@ export default function TransactionRow({ transaction, onDelete, showClient = tru
           <Text style={styles.notes} numberOfLines={1}>{transaction.notes}</Text>
         ) : null}
         {transaction.isDoubleEntry && transaction.counterClientName ? (
-          <Text style={styles.counterParty} numberOfLines={1}>
-            الطرف الآخر: {transaction.counterClientName}
-          </Text>
+          <View style={styles.counterBadge}>
+            <MaterialIcons name="compare-arrows" size={11} color={Colors.primaryLight} />
+            <Text style={styles.counterText}>{transaction.counterClientName}</Text>
+          </View>
         ) : null}
       </View>
+
+      {/* Amount + type */}
       <View style={styles.right}>
         <Text style={[styles.amount, { color: isGive ? Colors.error : Colors.success }]}>
           {isGive ? '-' : '+'}{formatAmount(transaction.amount, transaction.currency)}
         </Text>
-        <View style={[styles.typeBadge, { backgroundColor: isGive ? Colors.errorLight : Colors.successLight }]}>
-          <Text style={[styles.type, { color: isGive ? Colors.error : Colors.success }]}>
+        <View style={[
+          styles.typePill,
+          { backgroundColor: isGive ? Colors.errorLight : Colors.successLight,
+            borderColor: isGive ? Colors.error + '33' : Colors.success + '33' }
+        ]}>
+          <Text style={[styles.typeText, { color: isGive ? Colors.error : Colors.success }]}>
             {isGive ? 'له' : 'لنا'}
           </Text>
         </View>
         {onDelete && (
           <Pressable onPress={onDelete} hitSlop={10} style={styles.deleteBtn}>
-            <MaterialIcons name="delete-outline" size={17} color={Colors.text.muted} />
+            <MaterialIcons name="delete-outline" size={16} color={Colors.text.muted} />
           </Pressable>
         )}
       </View>
@@ -66,10 +79,12 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
     gap: Spacing.sm,
     ...Shadows.sm,
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
   },
-  icon: {
-    width: 38,
-    height: 38,
+  iconWrap: {
+    width: 36,
+    height: 36,
     borderRadius: BorderRadius.md,
     alignItems: 'center',
     justifyContent: 'center',
@@ -98,11 +113,20 @@ const styles = StyleSheet.create({
     textAlign: 'right',
     fontStyle: 'italic',
   },
-  counterParty: {
-    fontSize: FontSizes.xs,
-    color: Colors.primary,
-    marginTop: 2,
-    textAlign: 'right',
+  counterBadge: {
+    flexDirection: 'row-reverse',
+    alignItems: 'center',
+    gap: 3,
+    marginTop: 3,
+    backgroundColor: Colors.primarySurface,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: BorderRadius.full,
+    alignSelf: 'flex-end',
+  },
+  counterText: {
+    fontSize: 10,
+    color: Colors.primaryLight,
     fontWeight: '600',
   },
   right: {
@@ -115,12 +139,13 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.md,
     fontWeight: '800',
   },
-  typeBadge: {
+  typePill: {
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: BorderRadius.full,
+    borderWidth: 1,
   },
-  type: {
+  typeText: {
     fontSize: 11,
     fontWeight: '700',
   },

@@ -27,21 +27,23 @@ export default function TransactionsScreen() {
     return matchSearch && matchType && matchCurrency;
   });
 
-  const TypeBtn = ({ type, label }: { type: FilterType; label: string }) => (
+  const TypePill = ({ type, label, activeColor }: { type: FilterType; label: string; activeColor: string }) => (
     <Pressable
-      style={[styles.pill, typeFilter === type && styles.pillActive]}
+      style={[styles.pill, typeFilter === type && { backgroundColor: activeColor, borderColor: activeColor }]}
       onPress={() => setTypeFilter(type)}
     >
       <Text style={[styles.pillText, typeFilter === type && styles.pillTextActive]}>{label}</Text>
     </Pressable>
   );
 
-  const CurrBtn = ({ curr }: { curr: CurrencyFilter }) => (
+  const CurrPill = ({ curr }: { curr: CurrencyFilter }) => (
     <Pressable
-      style={[styles.pill, currencyFilter === curr && styles.pillActive]}
+      style={[styles.pill, currencyFilter === curr && styles.pillPrimaryActive]}
       onPress={() => setCurrencyFilter(curr)}
     >
-      <Text style={[styles.pillText, currencyFilter === curr && styles.pillTextActive]}>{curr === 'all' ? 'الكل' : curr}</Text>
+      <Text style={[styles.pillText, currencyFilter === curr && styles.pillTextActive]}>
+        {curr === 'all' ? 'الكل' : curr}
+      </Text>
     </Pressable>
   );
 
@@ -49,13 +51,15 @@ export default function TransactionsScreen() {
     <View style={[styles.root, { paddingTop: insets.top }]}>
       {/* Header */}
       <View style={styles.header}>
+        <View style={styles.countBadge}>
+          <Text style={styles.countText}>{filtered.length}</Text>
+        </View>
         <Text style={styles.headerTitle}>جميع المعاملات</Text>
-        <Text style={styles.count}>{filtered.length} معاملة</Text>
       </View>
 
       {/* Search */}
-      <View style={styles.searchContainer}>
-        <MaterialIcons name="search" size={20} color={Colors.text.muted} style={styles.searchIcon} />
+      <View style={styles.searchWrap}>
+        <MaterialIcons name="search" size={19} color={Colors.text.muted} style={{ marginLeft: 6 }} />
         <TextInput
           style={styles.searchInput}
           placeholder="البحث عن عميل أو ملاحظة..."
@@ -64,22 +68,27 @@ export default function TransactionsScreen() {
           onChangeText={setSearch}
           textAlign="right"
         />
+        {search.length > 0 && (
+          <Pressable onPress={() => setSearch('')} hitSlop={8}>
+            <MaterialIcons name="close" size={16} color={Colors.text.muted} />
+          </Pressable>
+        )}
       </View>
 
       {/* Type Filter */}
       <View style={styles.filterRow}>
-        <TypeBtn type="all" label="الكل" />
-        <TypeBtn type="give" label="مدفوع" />
-        <TypeBtn type="take" label="مقبوض" />
+        <TypePill type="all"  label="الكل"    activeColor={Colors.primaryLight} />
+        <TypePill type="give" label="له (مدفوع)" activeColor={Colors.error} />
+        <TypePill type="take" label="لنا (مقبوض)" activeColor={Colors.success} />
       </View>
 
       {/* Currency Filter */}
       <View style={styles.filterRow}>
-        <CurrBtn curr="all" />
-        <CurrBtn curr="USD" />
-        <CurrBtn curr="EUR" />
-        <CurrBtn curr="SYP" />
-        <CurrBtn curr="TRY" />
+        <CurrPill curr="all" />
+        <CurrPill curr="USD" />
+        <CurrPill curr="EUR" />
+        <CurrPill curr="SYP" />
+        <CurrPill curr="TRY" />
       </View>
 
       <FlatList
@@ -95,7 +104,9 @@ export default function TransactionsScreen() {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={styles.empty}>
-            <MaterialIcons name="search-off" size={48} color={Colors.text.muted} />
+            <View style={styles.emptyIcon}>
+              <MaterialIcons name="search-off" size={36} color={Colors.text.muted} />
+            </View>
             <Text style={styles.emptyText}>لا توجد نتائج</Text>
           </View>
         }
@@ -106,6 +117,7 @@ export default function TransactionsScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: Colors.background },
+
   header: {
     backgroundColor: Colors.primary,
     paddingHorizontal: Spacing.md,
@@ -114,41 +126,58 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  headerTitle: { fontSize: FontSizes.xl, fontWeight: '700', color: '#fff' },
-  count: { fontSize: FontSizes.sm, color: 'rgba(255,255,255,0.6)' },
-  searchContainer: {
+  headerTitle: { fontSize: FontSizes.xl, fontWeight: '800', color: '#fff', letterSpacing: 0.2 },
+  countBadge: {
+    backgroundColor: Colors.accentBright + '28',
+    borderWidth: 1,
+    borderColor: Colors.accentBright + '55',
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: BorderRadius.full,
+  },
+  countText: { fontSize: FontSizes.sm, fontWeight: '800', color: Colors.accentBright },
+
+  searchWrap: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
     backgroundColor: Colors.card,
     margin: Spacing.md,
     marginBottom: Spacing.sm,
-    borderRadius: BorderRadius.md,
+    borderRadius: BorderRadius.lg,
     paddingHorizontal: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.border,
     ...Shadows.sm,
   },
-  searchIcon: { marginLeft: Spacing.sm },
-  searchInput: { flex: 1, height: 44, color: Colors.text.primary, fontSize: FontSizes.md },
+  searchInput: { flex: 1, height: 46, color: Colors.text.primary, fontSize: FontSizes.md },
+
   filterRow: {
     flexDirection: 'row-reverse',
     paddingHorizontal: Spacing.md,
     gap: Spacing.sm,
     marginBottom: Spacing.sm,
+    flexWrap: 'wrap',
   },
   pill: {
     paddingHorizontal: Spacing.md,
-    paddingVertical: 6,
+    paddingVertical: 7,
     borderRadius: BorderRadius.full,
     backgroundColor: Colors.card,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: Colors.border,
   },
-  pillActive: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
-  },
+  pillPrimaryActive: { backgroundColor: Colors.primary, borderColor: Colors.primary },
   pillText: { fontSize: FontSizes.sm, color: Colors.text.secondary, fontWeight: '600' },
   pillTextActive: { color: '#fff' },
-  list: { padding: Spacing.md, paddingBottom: 100 },
-  empty: { alignItems: 'center', paddingVertical: 48, gap: Spacing.sm },
+
+  list: { padding: Spacing.md, paddingBottom: 110 },
+
+  empty: { alignItems: 'center', paddingVertical: 52, gap: Spacing.md },
+  emptyIcon: {
+    width: 72, height: 72, borderRadius: 36,
+    backgroundColor: Colors.backgroundAlt,
+    alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1.5, borderColor: Colors.border,
+  },
   emptyText: { color: Colors.text.muted, fontSize: FontSizes.md },
 });

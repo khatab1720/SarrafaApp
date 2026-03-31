@@ -11,24 +11,23 @@ export default function TabLayout() {
   const router = useRouter();
 
   const tabBarHeight = Platform.select({
-    ios: insets.bottom + 68,
-    android: insets.bottom + 68,
-    default: 72,
+    ios: insets.bottom + 66,
+    android: insets.bottom + 66,
+    default: 70,
   });
 
   const tabBarStyle = {
     height: tabBarHeight,
     paddingTop: 10,
     paddingBottom: Platform.select({
-      ios: insets.bottom + 10,
-      android: insets.bottom + 10,
-      default: 12,
+      ios: insets.bottom + 8,
+      android: insets.bottom + 8,
+      default: 10,
     }),
-    paddingHorizontal: 8,
-    // Glassmorphism bottom nav
-    backgroundColor: 'rgba(27, 82, 204, 0.94)',
+    paddingHorizontal: 6,
+    backgroundColor: Colors.primary,
     borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.10)',
+    borderTopColor: 'rgba(255,255,255,0.08)',
     ...Shadows.lg,
   };
 
@@ -37,11 +36,11 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle,
-        tabBarActiveTintColor: Colors.accent,
-        tabBarInactiveTintColor: 'rgba(255,255,255,0.45)',
+        tabBarActiveTintColor: Colors.accentBright,
+        tabBarInactiveTintColor: 'rgba(255,255,255,0.40)',
         tabBarLabelStyle: {
           fontSize: 10,
-          fontWeight: '600',
+          fontWeight: '700',
           marginTop: 2,
           letterSpacing: 0.2,
         },
@@ -70,15 +69,15 @@ export default function TabLayout() {
         options={{
           title: '',
           tabBarIcon: () => (
-            <View style={styles.fabContainer}>
+            <View style={styles.fabWrapper}>
               <Pressable
                 style={({ pressed }) => [
                   styles.fab,
-                  pressed && { opacity: 0.85, transform: [{ scale: 0.94 }] },
+                  pressed && { opacity: 0.82, transform: [{ scale: 0.92 }] },
                 ]}
                 onPress={() => router.push('/add-transaction')}
               >
-                <MaterialIcons name="add" size={32} color={Colors.primary} />
+                <MaterialIcons name="add" size={30} color={Colors.primary} />
               </Pressable>
             </View>
           ),
@@ -108,21 +107,20 @@ export default function TabLayout() {
 }
 
 const styles = StyleSheet.create({
-  fabContainer: {
+  fabWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
   },
   fab: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 58,
+    height: 58,
+    borderRadius: 29,
     backgroundColor: Colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 3,
-    borderColor: 'rgba(255,255,255,0.20)',
-    ...Shadows.lg,
-    shadowColor: Colors.accent,
+    borderWidth: 2.5,
+    borderColor: 'rgba(255,255,255,0.22)',
+    ...Shadows.accent,
   },
 });

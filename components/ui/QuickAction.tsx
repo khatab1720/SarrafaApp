@@ -11,14 +11,17 @@ interface QuickActionProps {
   color?: string;
 }
 
-export default function QuickAction({ icon, label, onPress, color = Colors.accent }: QuickActionProps) {
+export default function QuickAction({ icon, label, onPress, color = Colors.accentBright }: QuickActionProps) {
   return (
     <Pressable
-      style={({ pressed }) => [styles.container, pressed && { opacity: 0.75, transform: [{ scale: 0.95 }] }]}
+      style={({ pressed }) => [
+        styles.container,
+        pressed && { opacity: 0.72, transform: [{ scale: 0.93 }] },
+      ]}
       onPress={onPress}
     >
-      <View style={[styles.circle, { backgroundColor: 'rgba(255,255,255,0.10)', borderColor: 'rgba(255,255,255,0.15)' }]}>
-        <MaterialIcons name={icon} size={22} color={color} />
+      <View style={styles.circle}>
+        <MaterialIcons name={icon} size={23} color={color} />
       </View>
       <Text style={styles.label}>{label}</Text>
     </Pressable>
@@ -28,20 +31,23 @@ export default function QuickAction({ icon, label, onPress, color = Colors.accen
 const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
-    gap: 6,
+    gap: 7,
   },
   circle: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+    width: 54,
+    height: 54,
+    borderRadius: 27,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
+    backgroundColor: 'rgba(255,255,255,0.11)',
+    borderWidth: 1.5,
+    borderColor: 'rgba(255,255,255,0.18)',
   },
   label: {
     fontSize: FontSizes.xs,
-    color: 'rgba(255,255,255,0.75)',
-    fontWeight: '600',
+    color: 'rgba(255,255,255,0.82)',
+    fontWeight: '700',
     textAlign: 'center',
+    letterSpacing: 0.2,
   },
 });

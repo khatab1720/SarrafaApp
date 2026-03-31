@@ -14,7 +14,7 @@ interface CurrencyCardProps {
 
 function SyrianFlagIcon() {
   return (
-    <View style={{ width: 26, height: 18, borderRadius: 3, overflow: 'hidden' }}>
+    <View style={{ width: 28, height: 20, borderRadius: 4, overflow: 'hidden' }}>
       <View style={{ flex: 1, backgroundColor: '#009000' }} />
       <View style={{ flex: 1, backgroundColor: '#FFFFFF' }} />
       <View style={{ flex: 1, backgroundColor: '#000000' }} />
@@ -22,50 +22,69 @@ function SyrianFlagIcon() {
   );
 }
 
-const CURRENCY_COLORS: Record<Currency, { bg: string; text: string; border: string; accent: string }> = {
-  USD: { bg: '#F0FDF4', text: '#166534', border: '#BBF7D0', accent: '#16A34A' },
-  EUR: { bg: '#EFF6FF', text: '#1E40AF', border: '#BFDBFE', accent: '#2563EB' },
-  SYP: { bg: '#FFFBEB', text: '#92400E', border: '#FDE68A', accent: '#D97706' },
-  TRY: { bg: '#FDF4FF', text: '#6B21A8', border: '#E9D5FF', accent: '#9333EA' },
+type CurrencyColorKey = 'currencyUSD' | 'currencyEUR' | 'currencySYP' | 'currencyTRY';
+
+const CURRENCY_THEME: Record<Currency, CurrencyColorKey> = {
+  USD: 'currencyUSD',
+  EUR: 'currencyEUR',
+  SYP: 'currencySYP',
+  TRY: 'currencyTRY',
+};
+
+const CURRENCY_LABELS: Record<Currency, { symbol: string; name: string }> = {
+  USD: { symbol: '$', name: 'دولار' },
+  EUR: { symbol: '€', name: 'يورو' },
+  SYP: { symbol: 'ل.س', name: 'ليرة' },
+  TRY: { symbol: '₺', name: 'تركية' },
 };
 
 export default function CurrencyCard({ currency, amount, label, icon, isSyrianFlag }: CurrencyCardProps) {
-  const colors = CURRENCY_COLORS[currency];
+  const themeKey = CURRENCY_THEME[currency];
+  const palette = Colors[themeKey];
   const isPositive = amount >= 0;
+  const amountColor = isPositive ? palette.accent : Colors.error;
 
   return (
-    <View style={[styles.card, { backgroundColor: colors.bg, borderColor: colors.border }]}>
-      {/* Top row: flag + currency code */}
+    <View style={[styles.card, { backgroundColor: palette.bg, borderColor: palette.border }]}>
+      {/* Top Row */}
       <View style={styles.topRow}>
-        <View style={[styles.currencyBadge, { backgroundColor: colors.accent + '18' }]}>
-          <Text style={[styles.currency, { color: colors.accent }]}>{currency}</Text>
+        {/* Flag / icon */}
+        <View style={styles.flagBox}>
+          {isSyrianFlag ? <SyrianFlagIcon /> : <Text style={styles.flagEmoji}>{icon}</Text>}
         </View>
-        {isSyrianFlag ? <SyrianFlagIcon /> : <Text style={styles.icon}>{icon}</Text>}
+        {/* Currency chip */}
+        <View style={[styles.chip, { backgroundColor: palette.icon + '22' }]}>
+          <Text style={[styles.chipText, { color: palette.icon }]}>{currency}</Text>
+        </View>
       </View>
 
-      {/* Label */}
-      <Text style={[styles.label, { color: colors.text }]} numberOfLines={1}>{label}</Text>
+      {/* Currency name */}
+      <Text style={[styles.currName, { color: palette.text + 'AA' }]} numberOfLines={1}>
+        {label}
+      </Text>
 
       {/* Amount */}
-      <Text style={[
-        styles.amount,
-        { color: isPositive ? colors.accent : Colors.error }
-      ]}>
+      <Text style={[styles.amount, { color: amountColor }]} numberOfLines={1} adjustsFontSizeToFit>
         {isPositive ? '+' : '-'}{formatAmount(Math.abs(amount), currency)}
       </Text>
+
+      {/* Bottom bar accent */}
+      <View style={[styles.accentBar, { backgroundColor: palette.icon }]} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    width: '48%',
+    width: '48.5%',
     borderRadius: BorderRadius.xl,
     borderWidth: 1.5,
     padding: Spacing.md,
     marginBottom: Spacing.sm,
     ...Shadows.sm,
     alignItems: 'flex-end',
+    overflow: 'hidden',
+    position: 'relative',
   },
   topRow: {
     flexDirection: 'row-reverse',
@@ -74,23 +93,26 @@ const styles = StyleSheet.create({
     width: '100%',
     marginBottom: Spacing.sm,
   },
-  icon: {
-    fontSize: 26,
+  flagBox: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  currencyBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 3,
+  flagEmoji: {
+    fontSize: 24,
+  },
+  chip: {
+    paddingHorizontal: 9,
+    paddingVertical: 4,
     borderRadius: BorderRadius.full,
   },
-  currency: {
+  chipText: {
     fontSize: FontSizes.xs,
     fontWeight: '800',
-    letterSpacing: 1,
+    letterSpacing: 0.8,
   },
-  label: {
+  currName: {
     fontSize: FontSizes.xs,
-    marginBottom: Spacing.sm,
-    opacity: 0.75,
+    marginBottom: 6,
     textAlign: 'right',
     fontWeight: '500',
   },
@@ -98,5 +120,16 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.md,
     fontWeight: '800',
     textAlign: 'right',
+    marginBottom: Spacing.sm,
+  },
+  accentBar: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 3,
+    borderBottomLeftRadius: BorderRadius.xl,
+    borderBottomRightRadius: BorderRadius.xl,
+    opacity: 0.6,
   },
 });

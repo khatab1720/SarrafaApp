@@ -71,7 +71,7 @@ function buildPdfHtml(
 
     /* Header */
     .header {
-      background: linear-gradient(135deg, #0D2137 0%, #1A3A5C 100%);
+      background: linear-gradient(135deg, #0C1E3E 0%, #1A4299 100%);
       color: #fff;
       padding: 32px 36px 24px;
       border-radius: 0 0 24px 24px;
@@ -80,8 +80,8 @@ function buildPdfHtml(
     .brand { display: flex; align-items: center; gap: 12px; }
     .brand-icon {
       width: 48px; height: 48px; border-radius: 12px;
-      background: rgba(240,180,41,0.2);
-      border: 2px solid rgba(240,180,41,0.5);
+      background: rgba(232,160,32,0.2);
+      border: 2px solid rgba(232,160,32,0.5);
       display: flex; align-items: center; justify-content: center;
       font-size: 22px;
     }
